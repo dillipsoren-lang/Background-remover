@@ -4,133 +4,242 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Photo Background Remover</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMc9SDsW5yib3Ucbv7saqFm72t2+gDg1cW7ijV3" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom right, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)),
+                        url('https://firebasestorage.googleapis.com/v0/b/sorenstarmedia.appspot.com/o/822302.png?alt=media&token=83451467-6bcd-4adb-b266-82ac42a9b361')
+                        no-repeat center center/cover;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+            color: #ffffff;
+            position: relative;
+            transition: width 0.3s ease;
+        }
+
+        .title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            overflow: hidden;
+            display: inline-block;
+            animation: slideText 5s linear infinite;
+        }
+
+        @keyframes slideText {
+            0%, 20% { width: 0; border-right: .1em solid #ffffff; }
+            50%, 80% { width: 100%; border-right: .1em solid transparent; }
+            100% { width: 0; }
+        }
+
+        .image-container {
+            width: 100%;
+            height: 200px;
+            margin: 20px 0;
+            border: 2px dashed rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+        }
+
+        .image-container p {
+            color: #ffffff;
+            font-size: 1rem;
+            position: absolute;
+            z-index: 1;
+        }
+
+        .upload-btn {
+            position: absolute;
+            bottom: -20px;
+            right: -20px;
+            background-color: #007bff;
+            color: #ffffff;
+            font-size: 24px;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .upload-btn:hover {
+            background-color: #0056b3;
+        }
+
+        #uploadedImage {
+            display: none;
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .processing {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            z-index: 2;
+        }
+
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #fff;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 600px) {
+            .card {
+                padding: 20px;
+            }
+            .title {
+                font-size: 1.5rem;
+            }
+            .image-container {
+                height: 150px;
+            }
+            .upload-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+        }
+    </style>
 </head>
-
-<style>
-    body {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: linear-gradient(to bottom right, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), 
-                    url('https://firebasestorage.googleapis.com/v0/b/sorenstarmedia.appspot.com/o/822302.png?alt=media&token=83451467-6bcd-4adb-b266-82ac42a9b361') 
-                    no-repeat center center/cover;
-    }
-
-    .card {
-        background: rgba(255, 255, 255, 0.1);
-        padding: 40px;
-        border-radius: 12px;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-        text-align: center;
-        max-width: 350px;
-        width: 90%;
-        color: #ffffff;
-        position: relative;
-    }
-
-    .title {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #ffffff;
-        margin-bottom: 20px;
-        white-space: nowrap;
-        overflow: hidden;
-        animation: slideText 5s linear infinite;
-    }
-
-    @keyframes slideText {
-        0%, 20% { width: 0; border-right: .1em solid #ffffff; }
-        50%, 80% { width: 100%; border-right: .1em solid transparent; }
-        100% { width: 0; }
-    }
-
-    .image-container {
-        width: 100%;
-        height: 200px;
-        margin: 20px 0;
-        border: 2px dashed rgba(255, 255, 255, 0.5);
-        border-radius: 10px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .image-container p {
-        color: #ffffff;
-        font-size: 1rem;
-        position: absolute;
-        z-index: 1;
-    }
-
-    .upload-btn {
-        position: absolute;
-        bottom: -25px;
-        right: -25px;
-        background-color: #007bff;
-        color: #ffffff;
-        font-size: 24px;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-
-    .upload-btn:hover {
-        background-color: #0056b3;
-    }
-
-    #uploadedImage {
-        display: none;
-        max-width: 100%;
-        border-radius: 10px;
-    }
-</style>
-
 <body>
     <div class="card">
         <div class="title">Photo Background Remover</div>
         
-        <div class="image-container" id="imageContainer" onclick="document.getElementById('imageUpload').click();">
-            <p>Click or Drag to Upload</p>
+        <div class="image-container" id="imageContainer" onclick="document.getElementById('imageUpload').click();" ondragover="event.preventDefault();" ondrop="handleDrop(event);">
+            <p id="uploadText">Click or Drag to Upload</p>
             <img id="uploadedImage" alt="Uploaded Image">
-            <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+            <input type="file" id="imageUpload" accept="image/*" style="display: none;" onchange="handleFileUpload(event)">
+            
+            <!-- Lottie Animation for Processing -->
+            <div class="processing" id="processingIcon">
+                <dotlottie-player src="https://lottie.host/3ddb4fa5-f582-4f59-8683-180c652ea428/f9nxBrrece.json" background="transparent" speed="1" style="width: 100%; height: 100%;" loop autoplay></dotlottie-player>
+            </div>
         </div>
         
         <div class="upload-btn" onclick="document.getElementById('imageUpload').click();">
-            <i class="fas fa-upload"></i>
+            <i class="fas fa-plus"></i>
         </div>
+
+        <button id="downloadBtn" style="display: none; background: #007bff;" onclick="downloadImage()">Download</button>
+        <button id="cancelBtn" style="display: none; background: #ff4757;" onclick="cancelImage()">Cancel</button>
     </div>
 
     <script>
-        const imageUploadInput = document.getElementById('imageUpload');
-        const imageContainer = document.getElementById('imageContainer');
-        const uploadedImage = document.getElementById('uploadedImage');
+        const apiKey = 'gtgxyS4qqzkLPBB5PZiBWdEA';
+        let removedImageBlob = null;
 
-        imageUploadInput.addEventListener('change', function (event) {
-            handleImageUpload(event.target.files[0]);
-        });
+        function handleDrop(event) {
+            event.preventDefault();
+            const file = event.dataTransfer.files[0];
+            if (file) processImage(file);
+        }
 
-        function handleImageUpload(file) {
-            if (file && file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    uploadedImage.src = e.target.result;
-                    uploadedImage.style.display = 'block';
-                    imageContainer.querySelector('p').style.display = 'none';
-                };
-                reader.readAsDataURL(file);
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) processImage(file);
+        }
+
+        function processImage(file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                document.getElementById('uploadText').style.display = 'none';
+                document.getElementById('uploadedImage').src = reader.result;
+                document.getElementById('uploadedImage').style.display = 'block';
+                document.getElementById("processingIcon").style.display = 'block';
+
+                removeBackground(file);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeBackground(file) {
+            const formData = new FormData();
+            formData.append("image_file", file);
+
+            fetch("https://api.remove.bg/v1.0/removebg", {
+                method: "POST",
+                headers: {
+                    "X-Api-Key": apiKey
+                },
+                body: formData
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                document.getElementById("processingIcon").style.display = 'none';
+                removedImageBlob = blob;
+                const imgURL = URL.createObjectURL(blob);
+                document.getElementById('uploadedImage').src = imgURL;
+                document.getElementById('downloadBtn').style.display = 'inline-block';
+                document.getElementById('cancelBtn').style.display = 'inline-block';
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Background removal failed. Please try again.");
+                document.getElementById("processingIcon").style.display = 'none';
+            });
+        }
+
+        function downloadImage() {
+            if (removedImageBlob) {
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(removedImageBlob);
+                link.download = "background-removed.png";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(link.href);
+            } else {
+                alert("No image available for download. Please upload an image first.");
             }
+        }
+
+        function cancelImage() {
+            document.getElementById('uploadedImage').style.display = 'none';
+            document.getElementById('downloadBtn').style.display = 'none';
+            document.getElementById('cancelBtn').style.display = 'none';
+            document.getElementById('uploadText').style.display = 'block';
+            removedImageBlob = null;
         }
     </script>
 </body>
